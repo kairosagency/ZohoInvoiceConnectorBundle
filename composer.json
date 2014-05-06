@@ -1,0 +1,38 @@
+{
+    "name": "kairos/zohoinvoiceconnectorbundle",
+    "type": "library",
+    "license": "LGPL-3.0",
+    "description": "Zoho invoice bundle for symfony2",
+    "keywords": ["zoho", "zoho invoice", "symfony2", "bundle"],
+    "homepage": "https://github.com/kairosagency/ZohoInvoiceConnectorBundle",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/kairosagency/ZohoInvoiceApiClient.git"
+        }
+    ],
+    "authors": [
+        {
+            "name": "t0k4rt",
+            "homepage": "https://github.com/t0k4rt",
+            "role": "Developer"
+        },
+        {
+            "name": "Matthiew",
+            "homepage": "https://github.com/Matthiew",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "symfony/framework-bundle": ">=2.1,<=2.4",
+        "kairos/zohoinvoiceapiclient": "dev-master"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~3.7"
+    },
+    "autoload": {
+        "psr-0": { "Kairos\\ZohoInvoiceConnectorBundle": "" }
+    },
+    "target-dir": "Kairos/ZohoInvoiceConnectorBundle"
+}
