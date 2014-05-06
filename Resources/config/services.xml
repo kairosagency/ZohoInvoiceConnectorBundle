@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="kairos_zoho_connector_bundle.class_analyzer.class">Kairos\ZohoInvoiceConnectorBundle\Reflection\ClassAnalyzer</parameter>
+        <parameter key="kairos_zoho_connector_bundle.isRecursive">false</parameter>
+
+        <!-- event subscribers -->
+        <parameter key="kairos_zoho_connector_bundle.contact_connector_subscriber.class">Kairos\ZohoInvoiceConnectorBundle\ORM\ContactConnectorSubscriber</parameter>
+        <parameter key="kairos_zoho_connector_bundle.item_connector.class">Kairos\ZohoInvoiceConnectorBundle\ORM\ItemConnectorSubscriber</parameter>
+        <parameter key="kairos_zoho_connector_bundle.invoice_connector.class">Kairos\ZohoInvoiceConnectorBundle\ORM\InvoiceConnectorSubscriber</parameter>
+
+        <parameter key="kairos_zoho_connector_bundle.auth_token"/>
+        <parameter key="kairos_zoho_connector_bundle.organization_id"/>
+        <parameter key="kairos_zoho_connector_bundle.default_tax_id"/>
+    </parameters>
+
+    <services>
+        <service id="kairos_zoho_connector_bundle.class_analyzer" class="%kairos_zoho_connector_bundle.class_analyzer.class%" public="false" />
+
+        <service id="kairos_zoho_connector_bundle.contact_connector_subscriber" class="%kairos_zoho_connector_bundle.contact_connector_subscriber.class%">
+            <argument  type="service" id="logger" />
+            <argument  type="service" id="kairos_zoho_connector_bundle.class_analyzer" />
+            <argument>%kairos_zoho_connector_bundle.isRecursive%</argument>
+            <argument>%kairos_zoho_connector_bundle.auth_token%</argument>
+            <argument>%kairos_zoho_connector_bundle.organization_id%</argument>
+            <tag name="doctrine.event_subscriber"/>
+        </service>
+
+        <service id="kairos_zoho_connector_bundle.item_connector" class="%kairos_zoho_connector_bundle.item_connector.class%">
+            <argument  type="service" id="logger" />
+            <argument  type="service" id="kairos_zoho_connector_bundle.class_analyzer" />
+            <argument>%kairos_zoho_connector_bundle.isRecursive%</argument>
+            <argument>%kairos_zoho_connector_bundle.auth_token%</argument>
+            <argument>%kairos_zoho_connector_bundle.organization_id%</argument>
+            <argument>%kairos_zoho_connector_bundle.default_tax_id%</argument>
+            <tag name="doctrine.event_subscriber"/>
+        </service>
+
+        <service id="kairos_zoho_connector_bundle.invoice_connector" class="%kairos_zoho_connector_bundle.invoice_connector.class%">
+            <argument  type="service" id="logger" />
+            <argument  type="service" id="kairos_zoho_connector_bundle.class_analyzer" />
+            <argument>%kairos_zoho_connector_bundle.isRecursive%</argument>
+            <argument>%kairos_zoho_connector_bundle.auth_token%</argument>
+            <argument>%kairos_zoho_connector_bundle.organization_id%</argument>
+            <tag name="doctrine.event_subscriber"/>
+        </service>
+    </services>
+
+</container>
