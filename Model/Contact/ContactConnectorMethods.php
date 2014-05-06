@@ -554,16 +554,22 @@ trait ContactConnectorMethods
                 'state' => strval($this->getShippingState()),
                 'zip' => strval($this->getShippingZipcode()),
                 'country' => strval($this->getShippingCountry()),
-            ),
-            'default_templates' => array()
+            )
         );
 
-        if($this->getInvoiceTemplateName())
+        if($this->getInvoiceTemplateName()) {
+            if(!isset($res['default_templates']))
+                $res['default_templates'] = array();
+
             $res['default_templates']['invoice_template_name'] = $this->getInvoiceTemplateName();
+        }
 
-        if($this->getInvoiceEmailTemplateName())
+        if($this->getInvoiceEmailTemplateName()) {
+            if(!isset($res['default_templates']))
+                $res['default_templates'] = array();
+
             $res['default_templates']['invoice_email_template_name'] = $this->getInvoiceEmailTemplateName();
-
+        }
         return $res;
     }
 
