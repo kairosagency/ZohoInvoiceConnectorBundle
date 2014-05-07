@@ -16,4 +16,11 @@ trait SyncedProperties
      */
     protected $synced;
 
+    /**
+     * @var DateTime $synced
+     *
+     * @ORM\Column(name="synced_timestamp", type="datetime", nullable=true)
+     */
+    protected $syncedTimestamp;
+
 }

@@ -2,6 +2,8 @@
 
 namespace Kairos\ZohoInvoiceConnectorBundle\Model\Contact;
 
+use Symfony\Component\Intl\Intl;
+
 /**
  * ContactConnectorMethods trait.
  *
@@ -526,6 +528,13 @@ trait ContactConnectorMethods
      */
     public function toArray()
     {
+        // format billing and shipping country
+        $billingCountry = $this->getBillingCountry();
+        $billingCountry = !empty($billingCountry) ? Intl::getRegionBundle()->getCountryName($billingCountry): '';
+
+        $shippingCountry = $this->getShippingCountry();
+        $shippingCountry = !empty($shippingCountry) ? Intl::getRegionBundle()->getCountryName($shippingCountry): '';
+
         $res = array(
             'contact_name' => $this->getFullname(),
             'company_name' => $this->getCompanyName(),
@@ -546,14 +555,14 @@ trait ContactConnectorMethods
                 'city' => strval($this->getBillingCity()),
                 'state' => strval($this->getBillingState()),
                 'zip' => strval($this->getBillingZipcode()),
-                'country' => strval($this->getBillingCountry()),
+                'country' => $billingCountry,
             ),
             'shipping_address' => array(
                 'address' => strval($this->getShippingStreet()),
                 'city' => strval($this->getShippingCity()),
                 'state' => strval($this->getShippingState()),
                 'zip' => strval($this->getShippingZipcode()),
-                'country' => strval($this->getShippingCountry()),
+                'country' => $shippingCountry,
             )
         );
 

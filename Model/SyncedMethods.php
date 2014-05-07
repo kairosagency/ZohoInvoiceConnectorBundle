@@ -31,5 +31,37 @@ trait SyncedMethods
         return $this->synced;
     }
 
+    /**
+     * Set synced
+     *
+     * @param \DateTime $syncedTimestamp
+     *
+     */
+    public function setSyncedTimestamp($syncedTimestamp)
+    {
+        $this->syncedTimestamp = $syncedTimestamp;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return \DateTime
+     */
+    public function getSyncedTimestamp()
+    {
+        return $this->syncedTimestamp;
+    }
+
+    /**
+     * Refresh timestamp
+     */
+    public function refreshSyncedTimestamp()
+    {
+        $this->syncedTimestamp = new \DateTime('now');
+
+        return $this;
+    }
+
 
 }
