@@ -151,6 +151,13 @@ $em->flush();
 ```
 
 
+## Synchronization command
+
+Sometimes zoho sync will fail, so your entity will have its "synced" set to false.
+You can use symfony command "php app/console kairos:zohoinvoiceconnector:sync" to trigger a manual synchronization
+with zoho invoice api on all unsynced entities.
+
+
 ## Todo
 
 * Add tests
