@@ -24,6 +24,13 @@ trait InvoiceConnectorProperties
     protected $zohoCustomerId;
 
     /**
+     * @var boolean $paidInvoice
+     *
+     * @ORM\Column(name="zoho_paid_invoice", type="boolean", nullable=true)
+     */
+    protected $paidInvoice;
+
+    /**
      * @var array $invoiceArgs
      *
      */

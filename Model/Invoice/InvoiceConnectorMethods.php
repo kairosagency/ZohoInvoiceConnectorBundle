@@ -56,6 +56,29 @@ trait InvoiceConnectorMethods
     }
 
     /**
+     * Set invoice paid
+     *
+     * @param boolean $paidInvoice
+     *
+     */
+    public function setPaidInvoice($paidInvoice)
+    {
+        $this->paidInvoice = $paidInvoice;
+
+        return $this;
+    }
+
+    /**
+     * is paidInvoice
+     *
+     * @return boolean
+     */
+    public function isPaidInvoice()
+    {
+        return $this->paidInvoice;
+    }
+
+    /**
      * Set invoice args
      *
      * @param array $customerId
