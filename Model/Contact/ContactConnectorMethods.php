@@ -540,15 +540,6 @@ trait ContactConnectorMethods
             'company_name' => $this->getCompanyName(),
             'website' => $this->getWebsite(),
             'contact_persons' => array(
-                array(
-                    'salutation' => $this->getCivility(),
-                    'first_name' => $this->getFirstname(),
-                    'last_name' => $this->getLastname(),
-                    'email' => $this->getContactEmail(),
-                    'phone' => $this->getContactPhone(),
-                    'mobile' => $this->getContactMobile(),
-                    'is_primary_contact' => true
-                )
             ),
             'billing_address' => array(
                 'address' => strval($this->getBillingStreet()),
@@ -565,6 +556,29 @@ trait ContactConnectorMethods
                 'country' => $shippingCountry,
             )
         );
+
+        if(!is_null($this->getZohoContactPersonId()))
+            $res['contact_persons'][] = array(
+                'contact_person_id' => $this->getZohoContactPersonId(),
+                'salutation' => $this->getCivility(),
+                'first_name' => $this->getFirstname(),
+                'last_name' => $this->getLastname(),
+                'email' => $this->getContactEmail(),
+                'phone' => $this->getContactPhone(),
+                'mobile' => $this->getContactMobile(),
+                'is_primary_contact' => true
+            );
+        else
+            $res['contact_persons'][] = array(
+                'salutation' => $this->getCivility(),
+                'first_name' => $this->getFirstname(),
+                'last_name' => $this->getLastname(),
+                'email' => $this->getContactEmail(),
+                'phone' => $this->getContactPhone(),
+                'mobile' => $this->getContactMobile(),
+                'is_primary_contact' => true
+            );
+
 
         if($this->getInvoiceTemplateName()) {
             if(!isset($res['default_templates']))

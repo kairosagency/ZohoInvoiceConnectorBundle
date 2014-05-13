@@ -14,7 +14,7 @@ trait SyncedProperties
      *
      * @ORM\Column(name="synced", type="boolean", nullable=true)
      */
-    protected $synced;
+    protected $synced = false;
 
     /**
      * @var DateTime $synced
