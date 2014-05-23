@@ -11,12 +11,12 @@ trait SyncedMethods
     /**
      * Set synced
      *
-     * @param boolean $synced
+     * @param boolean $zohoSynced
      *
      */
-    public function setSynced($synced)
+    public function setZohoSynced($zohoSynced)
     {
-        $this->synced = $synced;
+        $this->zohoSynced = $zohoSynced;
 
         return $this;
     }
@@ -26,20 +26,20 @@ trait SyncedMethods
      *
      * @return boolean
      */
-    public function isSynced()
+    public function isZohoSynced()
     {
-        return $this->synced;
+        return $this->zohoSynced;
     }
 
     /**
      * Set synced
      *
-     * @param \DateTime $syncedTimestamp
+     * @param \DateTime $zohoSyncedTimestamp
      *
      */
-    public function setSyncedTimestamp($syncedTimestamp)
+    public function setZohoSyncedTimestamp($zohoSyncedTimestamp)
     {
-        $this->syncedTimestamp = $syncedTimestamp;
+        $this->zohoSyncedTimestamp = $zohoSyncedTimestamp;
 
         return $this;
     }
@@ -48,17 +48,17 @@ trait SyncedMethods
      *
      * @return \DateTime
      */
-    public function getSyncedTimestamp()
+    public function getZohoSyncedTimestamp()
     {
-        return $this->syncedTimestamp;
+        return $this->zohoSyncedTimestamp;
     }
 
     /**
      * Refresh timestamp
      */
-    public function refreshSyncedTimestamp()
+    public function refreshZohoSyncedTimestamp()
     {
-        $this->syncedTimestamp = new \DateTime('now');
+        $this->zohoSyncedTimestamp = new \DateTime('now');
 
         return $this;
     }

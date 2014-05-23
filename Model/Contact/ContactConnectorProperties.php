@@ -34,7 +34,7 @@ trait ContactConnectorProperties
     /**
      * @var string $firstName
      *
-     * @ORM\Column(name="zoho_firstName", type="string", length=255, nullable=true)
+     * @ORM\Column(name="zoho_first_name", type="string", length=255, nullable=true)
      * @Assert\NotBlank(message="The firstName should not be blank")
      */
     protected $firstName;
@@ -42,7 +42,7 @@ trait ContactConnectorProperties
     /**
      * @var string $lastName
      *
-     * @ORM\Column(name="zoho_lastName", type="string", length=255, nullable=true)
+     * @ORM\Column(name="zoho_last_name", type="string", length=255, nullable=true)
      * @Assert\NotBlank(message="The lastName should not be blank")
      */
     protected $lastName;
@@ -199,14 +199,12 @@ trait ContactConnectorProperties
     /**
      * @var string $invoiceTemplateName
      *
-     * @ORM\Column(name="zoho_invoice_template_name", type="string", length=255, nullable=true)
      */
     protected $invoiceTemplateName;
 
     /**
      * @var string $invoiceEmailTemplateName
      *
-     * @ORM\Column(name="zoho_invoice_email_template_name", type="string", length=255, nullable=true)
      */
     protected $invoiceEmailTemplateName;
 
