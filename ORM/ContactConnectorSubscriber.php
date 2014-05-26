@@ -53,9 +53,27 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
             $uow = $em->getUnitOfWork();
             $changeset = $uow->getEntityChangeSet($entity);
 
-            unset($changeset['synced']);
-            if(count($changeset) > 0) {
-                $entity->setSynced(false);
+            $keys = array(
+                'email',
+                'firstName',
+                'lastName',
+                'billingStreet',
+                'billingCity',
+                'billingState',
+                'billingZipcode',
+                'billingCountry',
+                'zohoCurrencyId',
+                'civility',
+                'companyName',
+                'website',
+                'contactPhone',
+                'contactMobile',
+                'zohoCustomField1',
+                'zohoCustomField2',
+                'zohoCustomField3',
+            );
+            if($this->arrayHasKeys($changeset, $keys)) {
+                $entity->setZohoSynced(false);
                 $em->persist($entity);
                 $uow->recomputeSingleEntityChangeSet($classMetadata, $entity);
             }
@@ -79,7 +97,7 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
                 if(isset($response['contact']) && isset($response['contact']['contact_id']) && isset($response['contact']['primary_contact_id'])) {
                     $entity->setZohoContactId($response['contact']['contact_id']);
                     $entity->setZohoContactPersonId($response['contact']['primary_contact_id']);
-                    $entity->setSynced(true);
+                    $entity->setZohoSynced(true);
                     $em->persist($entity);
                     $em->flush();
                 }
@@ -103,10 +121,10 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
         $classMetadata = $em->getClassMetadata(get_class($entity));
 
         // can update only if entity is suported and contact id is set
-        if ($this->isEntitySupported($classMetadata) && $entity->getZohoContactId() && $entity->isSynced() == false) {
+        if ($this->isEntitySupported($classMetadata) && $entity->getZohoContactId() && $entity->isZohoSynced() == false) {
             try{
                 $response = $this->contactService->updateContact(array('contact_id' => $entity->getZohoContactId(), 'JSONString' => $entity->toJson()));
-                $entity->setSynced(true);
+                $entity->setZohoSynced(true);
                 $em->persist($entity);
                 $em->flush();
             }catch(\Exception $e) {

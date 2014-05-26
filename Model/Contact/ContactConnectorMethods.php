@@ -563,7 +563,7 @@ trait ContactConnectorMethods
                 'salutation' => $this->getCivility(),
                 'first_name' => $this->getFirstName(),
                 'last_name' => $this->getLastName(),
-                'email' => $this->getContactEmail(),
+                'email' => $this->getEmail(),
                 'phone' => $this->getContactPhone(),
                 'mobile' => $this->getContactMobile(),
                 'is_primary_contact' => true
@@ -573,7 +573,7 @@ trait ContactConnectorMethods
                 'salutation' => $this->getCivility(),
                 'first_name' => $this->getFirstName(),
                 'last_name' => $this->getLastName(),
-                'email' => $this->getContactEmail(),
+                'email' => $this->getEmail(),
                 'phone' => $this->getContactPhone(),
                 'mobile' => $this->getContactMobile(),
                 'is_primary_contact' => true

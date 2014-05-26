@@ -62,7 +62,7 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
                         ->setZohoInvoiceNumber($response['invoice']['invoice_number'])
                     ;
 
-                    $entity->setSynced(true);
+                    $entity->setZohoSynced(true);
                     $em->persist($entity);
                     $em->flush();
                 }
@@ -92,18 +92,18 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
 
             } catch(\Exception $e) {
                 // log api error
-                $res = $e->getResponse()->json();
+                //$res = $e->getResponse()->json();
                 $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                //$this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
             }
 
             try{
                 $response = $this->invoiceService->markSentInvoice(array('invoice_id' => $entity->getZohoInvoiceId()));
             } catch(\Exception $e) {
                 // log api error
-                $res = $e->getResponse()->json();
+                //$res = $e->getResponse()->json();
                 $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                //$this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
             }
         }
     }
