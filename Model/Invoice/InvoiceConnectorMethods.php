@@ -56,26 +56,95 @@ trait InvoiceConnectorMethods
     }
 
     /**
-     * Set invoice paid
+     * Set ZohoInvoiceNumber
      *
-     * @param boolean $paidInvoice
+     * @param string $invoiceNumber
      *
      */
-    public function setPaidInvoice($paidInvoice)
+    public function setZohoInvoiceNumber($invoiceNumber)
     {
-        $this->paidInvoice = $paidInvoice;
+        $this->zohoInvoiceNumber = $invoiceNumber;
 
         return $this;
     }
 
     /**
-     * is paidInvoice
+     * Get ZohoInvoiceNumber
+     *
+     * @return string
+     */
+    public function getZohoInvoiceNumber()
+    {
+        return $this->zohoInvoiceNumber;
+    }
+
+    /**
+     * Set payInvoice
+     *
+     * @param boolean $payInvoice
+     *
+     */
+    public function setPayInvoice($payInvoice)
+    {
+        $this->payInvoice = $payInvoice;
+
+        return $this;
+    }
+
+    /**
+     * get payInvoice
      *
      * @return boolean
      */
-    public function isPaidInvoice()
+    public function getPayInvoice()
     {
-        return $this->paidInvoice;
+        return $this->payInvoice;
+    }
+
+    /**
+     * Set send invoice
+     *
+     * @param boolean $sendInvoice
+     *
+     */
+    public function setSendInvoice($sendInvoice)
+    {
+        $this->sendInvoice = $sendInvoice;
+
+        return $this;
+    }
+
+    /**
+     * Get sendInvoice
+     *
+     * @return boolean
+     */
+    public function getSendInvoice()
+    {
+        return $this->sendInvoice;
+    }
+
+    /**
+     * Set invoice total
+     *
+     * @param float $invoiceTotal
+     *
+     */
+    public function setInvoiceTotal($invoiceTotal)
+    {
+        $this->invoiceTotal = $invoiceTotal;
+
+        return $this;
+    }
+
+    /**
+     * Get invoiceTotal
+     *
+     * @return float
+     */
+    public function getInvoiceTotal()
+    {
+        return $this->invoiceTotal;
     }
 
     /**
@@ -103,31 +172,6 @@ trait InvoiceConnectorMethods
 
         return $this->invoiceArgs;
     }
-
-    /**
-     * Set send invoice
-     *
-     * @param boolean $customerId
-     *
-     */
-    public function setSendInvoice($sendInvoice)
-    {
-        $this->sendInvoice = $sendInvoice;
-
-        return $this;
-    }
-
-    /**
-     * Get sendInvoice
-     *
-     * @return boolean
-     */
-    public function getSendInvoice()
-    {
-        return $this->sendInvoice;
-    }
-
-
 
     /**
      * Set items
@@ -165,6 +209,12 @@ trait InvoiceConnectorMethods
     {
         if(is_null($this->items))
             $this->items = new ArrayCollection();
+
+        if(!isset($item['item_id']))
+            throw new \Exception('Item id is missing');
+
+        if(!isset($item['quantity']))
+            throw new \Exception('Quantity is missing');
 
         $this->items->add($item);
 

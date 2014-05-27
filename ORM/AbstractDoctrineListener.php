@@ -49,5 +49,14 @@ abstract class AbstractDoctrineListener implements EventSubscriber
         return $this->logger;
     }
 
+    public function arrayHasKeys($array = array(), $keys =  array())
+    {
+        foreach($keys AS $key) {
+            if(array_key_exists($key, $array))
+                return true;
+        }
+        return false;
+    }
+
     abstract public function getSubscribedEvents();
 }

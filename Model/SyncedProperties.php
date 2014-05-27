@@ -12,15 +12,15 @@ trait SyncedProperties
     /**
      * @var boolean $synced
      *
-     * @ORM\Column(name="synced", type="boolean", nullable=true)
+     * @ORM\Column(name="zoho_synced", type="boolean", nullable=true)
      */
-    protected $synced;
+    protected $zohoSynced = false;
 
     /**
      * @var DateTime $synced
      *
-     * @ORM\Column(name="synced_timestamp", type="datetime", nullable=true)
+     * @ORM\Column(name="zoho_synced_timestamp", type="datetime", nullable=true)
      */
-    protected $syncedTimestamp;
+    protected $zohoSyncedTimestamp;
 
 }

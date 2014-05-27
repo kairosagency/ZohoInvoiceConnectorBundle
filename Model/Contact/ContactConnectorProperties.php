@@ -32,20 +32,20 @@ trait ContactConnectorProperties
     protected $civility;
 
     /**
-     * @var string $firstname
+     * @var string $firstName
      *
-     * @ORM\Column(name="zoho_firstname", type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="The firstname should not be blank")
+     * @ORM\Column(name="zoho_first_name", type="string", length=255, nullable=true)
+     * @Assert\NotBlank(message="The firstName should not be blank")
      */
-    protected $firstname;
+    protected $firstName;
 
     /**
-     * @var string $lastname
+     * @var string $lastName
      *
-     * @ORM\Column(name="zoho_lastname", type="string", length=255, nullable=true)
-     * @Assert\NotBlank(message="The lastname should not be blank")
+     * @ORM\Column(name="zoho_last_name", type="string", length=255, nullable=true)
+     * @Assert\NotBlank(message="The lastName should not be blank")
      */
-    protected $lastname;
+    protected $lastName;
 
     /**
      * @var string $companyName
@@ -62,11 +62,11 @@ trait ContactConnectorProperties
     protected $website;
 
     /**
-     * @var string $contactEmail
+     * @var string $email
      *
      * @ORM\Column(name="zoho_contact_email", type="string", length=255, nullable=true)
      */
-    protected $contactEmail;
+    protected $email;
 
     /**
      * @var string $contactPhone
@@ -81,6 +81,34 @@ trait ContactConnectorProperties
      * @ORM\Column(name="zoho_contact_mobile", type="string", length=255, nullable=true)
      */
     protected $contactMobile;
+
+    /**
+     * @var string $zohoCurrencyId
+     *
+     * @ORM\Column(name="zoho_currency_id", type="string", length=255, nullable=true)
+     */
+    protected $zohoCurrencyId;
+
+    /**
+     * @var string $zohoCustomField1
+     *
+     * @ORM\Column(name="zoho_custom_field_1", type="string", length=255, nullable=true)
+     */
+    protected $zohoCustomField1;
+
+    /**
+     * @var string $zohoCustomField2
+     *
+     * @ORM\Column(name="zoho_custom_field_2", type="string", length=255, nullable=true)
+     */
+    protected $zohoCustomField2;
+
+    /**
+     * @var string $zohoCustomField3
+     *
+     * @ORM\Column(name="zoho_custom_field_3", type="string", length=255, nullable=true)
+     */
+    protected $zohoCustomField3;
 
 
     /***                            ***/
@@ -171,14 +199,12 @@ trait ContactConnectorProperties
     /**
      * @var string $invoiceTemplateName
      *
-     * @ORM\Column(name="zoho_invoice_template_name", type="string", length=255, nullable=true)
      */
     protected $invoiceTemplateName;
 
     /**
      * @var string $invoiceEmailTemplateName
      *
-     * @ORM\Column(name="zoho_invoice_email_template_name", type="string", length=255, nullable=true)
      */
     protected $invoiceEmailTemplateName;
 

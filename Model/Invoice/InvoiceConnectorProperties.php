@@ -10,39 +10,50 @@ namespace Kairos\ZohoInvoiceConnectorBundle\Model\Invoice;
 trait InvoiceConnectorProperties
 {
     /**
-     * @var string $invoiceId
+     * @var string $zohoInvoiceId
      *
      * @ORM\Column(name="zoho_invoice_id", type="string", length=255, nullable=true)
      */
     protected $zohoInvoiceId;
 
     /**
-     * @var string $customerId
+     * @var string $zohoCustomerId
      *
      * @ORM\Column(name="zoho_customer_id", type="string", length=255, nullable=true)
      */
     protected $zohoCustomerId;
 
     /**
-     * @var boolean $paidInvoice
+     * @var string $zohoInvoiceNumber
      *
-     * @ORM\Column(name="zoho_paid_invoice", type="boolean", nullable=true)
+     * @ORM\Column(name="zoho_invoice_number", type="string", length=255, nullable=true)
      */
-    protected $paidInvoice;
+    protected $zohoInvoiceNumber;
 
     /**
-     * @var array $invoiceArgs
+     * @var float $invoiceTotal
+     * @ORM\Column(name="zoho_invoice_total", type="float", nullable=true)
+     */
+    protected $invoiceTotal;
+
+    /**
+     * @var boolean $payInvoice
      *
      */
-    protected $invoiceArgs;
+    protected $payInvoice = false;
 
     /**
      * Should send invoice ?
      *
      * @var boolean $sendInvoice
      */
-    protected $sendInvoice;
+    protected $sendInvoice = false;
 
+    /**
+     * @var array $invoiceArgs
+     *
+     */
+    protected $invoiceArgs;
     /**
      * Array of items in the invoice
      * @var ArrayCollection $items

@@ -31,10 +31,13 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
 
     protected $invoiceService;
 
+    protected $paymentService;
+
     public function __construct(Logger $logger, ClassAnalyzer $classAnalyser, $isRecursive, $authToken, $organizationId)
     {
         parent::__construct($logger, $classAnalyser, $isRecursive, $authToken, $organizationId);
         $this->invoiceService = ZohoInvoiceApiClient::getService('Invoices/InvoicesService', array('authtoken' => $this->authToken, 'organization_id' => $this->organizationId));
+        $this->paymentService = ZohoInvoiceApiClient::getService('CustomerPayments/CustomerPaymentsService', array('authtoken' => $this->authToken, 'organization_id' => $this->organizationId));
     }
 
     /**
@@ -49,9 +52,17 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
         if ($this->isEntitySupported($classMetadata)) {
             try{
                 $response = $this->invoiceService->createInvoice(array('JSONString' => $entity->toJson()));
-                if(isset($response['invoice']) && isset($response['invoice']['invoice_id'])) {
-                    $entity->setZohoInvoiceId($response['invoice']['invoice_id']);
-                    $entity->setSynced(true);
+                if(isset($response['invoice'])
+                    && isset($response['invoice']['invoice_id'])
+                    && isset($response['invoice']['invoice_number'])
+                    && isset($response['invoice']['total'])) {
+                    $entity
+                        ->setZohoInvoiceId($response['invoice']['invoice_id'])
+                        ->setInvoiceTotal($response['invoice']['total'])
+                        ->setZohoInvoiceNumber($response['invoice']['invoice_number'])
+                    ;
+
+                    $entity->setZohoSynced(true);
                     $em->persist($entity);
                     $em->flush();
                 }
@@ -63,25 +74,63 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
                 $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
             }
 
-            if($entity->getZohoInvoiceId()) {
-                try{
-                    $response = $this->invoiceService->emailInvoice(array('invoice_id' => $entity->getZohoInvoiceId()));
+            if($entity->getSendInvoice()) {
+                $this->sendInvoice($entity);
+            }
 
-                }catch(\Exception $e) {
-                    // log api error
-                    $res = $e->getResponse()->json();
-                    $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                    $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-                }
+            if($entity->getPayInvoice()) {
+                $this->payInvoice($entity);
+            }
+        }
+    }
 
-                try{
-                    $response = $this->invoiceService->markSentInvoice(array('invoice_id' => $entity->getZohoInvoiceId()));
-                }catch(\Exception $e) {
-                    // log api error
-                    $res = $e->getResponse()->json();
-                    $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                    $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-                }
+    public function sendInvoice($entity)
+    {
+        if($entity->getZohoCustomerId()) {
+            try{
+                $response = $this->invoiceService->emailInvoice(array('invoice_id' => $entity->getZohoInvoiceId()));
+
+            } catch(\Exception $e) {
+                // log api error
+                //$res = $e->getResponse()->json();
+                $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
+                //$this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+            }
+
+            try{
+                $response = $this->invoiceService->markSentInvoice(array('invoice_id' => $entity->getZohoInvoiceId()));
+            } catch(\Exception $e) {
+                // log api error
+                //$res = $e->getResponse()->json();
+                $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
+                //$this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+            }
+        }
+    }
+
+    public function payInvoice($entity)
+    {
+        if($entity->getInvoiceTotal() > 0 && $entity->getZohoCustomerId() && $entity->getZohoInvoiceId()) {
+            try{
+                $now = new \DateTime('now');
+                $jsonString = json_encode(array(
+                        'customer_id' => $entity->getZohoCustomerId(),
+                        'invoices' => array(
+                            array(
+                                'invoice_id' => $entity->getZohoInvoiceId(),
+                                'amount_applied' => $entity->getInvoiceTotal(),
+                            )
+                        ),
+                        'date' => $now->format('Y-m-d'),
+                        'amount' => $entity->getInvoiceTotal(),
+                    ));
+                $response = $this->paymentService->createCustomerPayment(array('JSONString' => $jsonString));
+
+            } catch(\Exception $e) {
+                // log api error
+                $res = $e->getResponse()->json();
+                $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
+                $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
             }
         }
     }

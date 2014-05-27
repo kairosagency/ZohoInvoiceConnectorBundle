@@ -54,9 +54,15 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
             $uow = $em->getUnitOfWork();
             $changeset = $uow->getEntityChangeSet($entity);
 
-            unset($changeset['synced']);
-            if(count($changeset) > 0) {
-                $entity->setSynced(false);
+            $keys = array(
+                'name',
+                'description',
+                'rate',
+                'unit',
+                'zohoTaxId',
+            );
+            if($this->arrayHasKeys($changeset, $keys)) {
+                $entity->setZohoSynced(false);
                 $em->persist($entity);
                 $uow->recomputeSingleEntityChangeSet($classMetadata, $entity);
             }
@@ -83,7 +89,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
                 $response = $this->itemService->createItem(array('JSONString' => $entity->toJson()));
                 if(isset($response['item']) && isset($response['item']['item_id'])) {
                     $entity->setZohoItemId($response['item']['item_id']);
-                    $entity->setSynced(true);
+                    $entity->setZohoSynced(true);
                     $em->persist($entity);
                     $em->flush();
                 }
@@ -108,10 +114,10 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
         $classMetadata = $em->getClassMetadata(get_class($entity));
 
         // can update only if entity is suported and contact id is set
-        if ($this->isEntitySupported($classMetadata) && $entity->getZohoItemId() && $entity->isSynced() == false) {
+        if ($this->isEntitySupported($classMetadata) && $entity->getZohoItemId() && $entity->isZohoSynced() == false) {
             try{
                 $response = $this->itemService->updateItem(array('item_id' => $entity->getZohoItemId(), 'JSONString' => $entity->toJson()));
-                $entity->setSynced(true);
+                $entity->setZohoSynced(true);
                 $em->persist($entity);
                 $em->flush();
             } catch(\Exception $e) {

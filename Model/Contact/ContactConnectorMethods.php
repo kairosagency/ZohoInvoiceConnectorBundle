@@ -79,47 +79,47 @@ trait ContactConnectorMethods
 
 
     /**
-     * Set firstname
+     * Set firstName
      *
-     * @param string $firstname
+     * @param string $firstName
      */
-    public function setFirstname($firstname)
+    public function setFirstName($firstName)
     {
-        $this->firstname = $firstname;
+        $this->firstName = $firstName;
 
         return $this;
     }
 
     /**
-     * Get firstname
+     * Get firstName
      *
      * @return string
      */
-    public function getFirstname()
+    public function getFirstName()
     {
-        return $this->firstname;
+        return $this->firstName;
     }
 
     /**
-     * Set lastname
+     * Set lastName
      *
-     * @param string $lastname
+     * @param string $lastName
      */
-    public function setLastname($lastname)
+    public function setLastName($lastName)
     {
-        $this->lastname = $lastname;
+        $this->lastName = $lastName;
 
         return $this;
     }
 
     /**
-     * Get lastname
+     * Get lastName
      *
      * @return string
      */
-    public function getLastname()
+    public function getLastName()
     {
-        return $this->lastname;
+        return $this->lastName;
     }
 
     /**
@@ -129,7 +129,7 @@ trait ContactConnectorMethods
      */
     public function getFullname()
     {
-        return $this->civility . ' ' . $this->firstname . ' ' .  $this->lastname;
+        return $this->civility . ' ' . $this->firstName . ' ' .  $this->lastName;
     }
 
     /**
@@ -177,25 +177,25 @@ trait ContactConnectorMethods
     }
 
     /**
-     * Set contact email
+     * Set $email
      *
-     * @param string $contactEmail
+     * @param string $email
      */
-    public function setContactEmail($contactEmail)
+    public function setEmail($email)
     {
-        $this->contactEmail = $contactEmail;
+        $this->email = $email;
 
         return $this;
     }
 
     /**
-     * Get contactEmail
+     * Get Email
      *
      * @return string
      */
-    public function getContactEmail()
+    public function getEmail()
     {
-        return $this->contactEmail;
+        return $this->email;
     }
 
     /**
@@ -540,15 +540,6 @@ trait ContactConnectorMethods
             'company_name' => $this->getCompanyName(),
             'website' => $this->getWebsite(),
             'contact_persons' => array(
-                array(
-                    'salutation' => $this->getCivility(),
-                    'first_name' => $this->getFirstname(),
-                    'last_name' => $this->getLastname(),
-                    'email' => $this->getContactEmail(),
-                    'phone' => $this->getContactPhone(),
-                    'mobile' => $this->getContactMobile(),
-                    'is_primary_contact' => true
-                )
             ),
             'billing_address' => array(
                 'address' => strval($this->getBillingStreet()),
@@ -565,6 +556,29 @@ trait ContactConnectorMethods
                 'country' => $shippingCountry,
             )
         );
+
+        if(!is_null($this->getZohoContactPersonId()))
+            $res['contact_persons'][] = array(
+                'contact_person_id' => $this->getZohoContactPersonId(),
+                'salutation' => $this->getCivility(),
+                'first_name' => $this->getFirstName(),
+                'last_name' => $this->getLastName(),
+                'email' => $this->getEmail(),
+                'phone' => $this->getContactPhone(),
+                'mobile' => $this->getContactMobile(),
+                'is_primary_contact' => true
+            );
+        else
+            $res['contact_persons'][] = array(
+                'salutation' => $this->getCivility(),
+                'first_name' => $this->getFirstName(),
+                'last_name' => $this->getLastName(),
+                'email' => $this->getEmail(),
+                'phone' => $this->getContactPhone(),
+                'mobile' => $this->getContactMobile(),
+                'is_primary_contact' => true
+            );
+
 
         if($this->getInvoiceTemplateName()) {
             if(!isset($res['default_templates']))
