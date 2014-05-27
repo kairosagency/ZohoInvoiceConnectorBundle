@@ -5,12 +5,6 @@
     "description": "Zoho invoice bundle for symfony2",
     "keywords": ["zoho", "zoho invoice", "symfony2", "bundle"],
     "homepage": "https://github.com/kairosagency/ZohoInvoiceConnectorBundle",
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/kairosagency/ZohoInvoiceApiClient.git"
-        }
-    ],
     "authors": [
         {
             "name": "t0k4rt",
