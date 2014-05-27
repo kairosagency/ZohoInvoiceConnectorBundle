@@ -16,11 +16,6 @@
             "name": "t0k4rt",
             "homepage": "https://github.com/t0k4rt",
             "role": "Developer"
-        },
-        {
-            "name": "Matthiew",
-            "homepage": "https://github.com/Matthiew",
-            "role": "Developer"
         }
     ],
     "require": {
