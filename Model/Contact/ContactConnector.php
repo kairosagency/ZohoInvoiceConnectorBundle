@@ -12,6 +12,7 @@ use Kairos\ZohoInvoiceConnectorBundle\Model AS BaseTrait;
 trait ContactConnector
 {
     use ContactConnectorProperties,
+        ContactConnectorSafeProperties,
         ContactConnectorMethods,
         BaseTrait\Synced
         ;
