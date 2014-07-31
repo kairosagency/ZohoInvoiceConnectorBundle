@@ -23,4 +23,10 @@ trait SyncedProperties
      */
     protected $zohoSyncedTimestamp;
 
+    /**
+     * @var array $zohoErrors
+     *
+     */
+    protected $zohoError;
+
 }

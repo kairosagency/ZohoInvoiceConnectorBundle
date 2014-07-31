@@ -100,6 +100,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
                 $res = $e->getResponse()->json();
                 $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
                 $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                $entity->setZohoError(array($res['code'] => $res['message']));
             }
         }
     }
@@ -125,6 +126,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
                 $res = $e->getResponse()->json();
                 $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
                 $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                $entity->setZohoError(array($res['code'] => $res['message']));
             }
         }
         // in case the object was not created on zoho side

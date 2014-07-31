@@ -72,6 +72,7 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
                 $res = $e->getResponse()->json();
                 $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
                 $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                $entity->setZohoError(array($res['code'] => $res['message']));
             }
 
             if($entity->getSendInvoice()) {
@@ -131,6 +132,7 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
                 $res = $e->getResponse()->json();
                 $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
                 $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                $entity->setZohoError(array($res['code'] => $res['message']));
             }
         }
     }

@@ -64,4 +64,34 @@ trait SyncedMethods
     }
 
 
+    /**
+     *
+     * @return array
+     */
+    public function getZohoError()
+    {
+        return $this->zohoError;
+    }
+
+    /**
+     *
+     * @return array
+     */
+    public function setZohoError($zohoError)
+    {
+        $this->zohoError = $zohoError;
+
+        return $this;
+    }
+
+    /**
+     *
+     * @return boolean
+     */
+    public function hasZohoError()
+    {
+        return !is_null($this->zohoError);
+    }
+
+
 }
