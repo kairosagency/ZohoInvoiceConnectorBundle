@@ -46,6 +46,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function preUpdate(PreUpdateEventArgs $args)
     {
+        $this->getLogger()->err('[ItemConnectorSubscriber] preUpdate');
         $entity = $args->getEntity();
         $em  = $args->getEntityManager();
         $classMetadata = $em->getClassMetadata(get_class($entity));
@@ -75,6 +76,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function postPersist(LifecycleEventArgs $args)
     {
+        $this->getLogger()->err('[ItemConnectorSubscriber] postPersist');
         $entity = $args->getEntity();
         $em  = $args->getEntityManager();
         $classMetadata = $em->getClassMetadata(get_class($entity));
@@ -110,6 +112,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function postUpdate(LifecycleEventArgs $args)
     {
+        $this->getLogger()->err('[PlanConnectorSubscriber] postUpdate');
         $entity = $args->getEntity();
         $em  = $args->getEntityManager();
         $classMetadata = $em->getClassMetadata(get_class($entity));
