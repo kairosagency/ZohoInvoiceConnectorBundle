@@ -11,6 +11,7 @@
 
 namespace Kairos\ZohoInvoiceConnectorBundle\ORM;
 
+use Doctrine\ORM\EntityManager;
 use Kairos\ZohoInvoiceConnectorBundle\Reflection\ClassAnalyzer;
 use Symfony\Bridge\Monolog\Logger;
 
@@ -18,7 +19,6 @@ use Kairos\ZohoInvoiceApi\ZohoInvoiceApiClient;
 
 use Doctrine\Common\Persistence\Mapping\ClassMetadata,
     Doctrine\ORM\Event\PreUpdateEventArgs,
-    Doctrine\ORM\Event\LifecycleEventArgs,
     Doctrine\ORM\Event\OnFlushEventArgs,
     Doctrine\ORM\Events;
 
@@ -47,7 +47,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function preUpdate(PreUpdateEventArgs $args)
     {
-                $entity = $args->getEntity();
+        $entity = $args->getEntity();
         $em  = $args->getEntityManager();
         $classMetadata = $em->getClassMetadata(get_class($entity));
         // can update only if entity is supported and some properties have changed (except the synced to avoid loops ...)
@@ -84,26 +84,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
             $classMetadata = $em->getClassMetadata(get_class($entity));
             if($this->isEntitySupported($classMetadata)) {
                 $this->getLogger()->info('[ZohoItemConnectorSubscriber][onFlush] Scheduled for insertion');
-
-                try{
-                    // if zoho tax id is not defined and default tax id is defined, we set the default tax id
-                    if(is_null($entity->getZohoTaxId()) && $this->defaultTaxId)
-                        $entity->setZohoTaxId($this->defaultTaxId);
-
-                    $response = $this->itemService->createItem(array('JSONString' => $entity->toJson()));
-                    if(isset($response['item']) && isset($response['item']['item_id'])) {
-                        $entity->setZohoItemId($response['item']['item_id']);
-                        $entity->setZohoSynced(true);
-                        $this->persistAndRecomputeChangeset($em, $uow, $entity);
-                    }
-
-                }catch(\Exception $e) {
-                    // log api error
-                    $res = $e->getResponse()->json();
-                    $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                    $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-                    $entity->setZohoError(array($res['code'] => $res['message']));
-                }
+                $this->postPersist($em, $uow, $entity);
             }
         }
 
@@ -111,114 +92,69 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
             $classMetadata = $em->getClassMetadata(get_class($entity));
             if($this->isEntitySupported($classMetadata)) {
                 $this->getLogger()->info('[ZohoItemConnectorSubscriber][onFlush] Scheduled for updates');
-                if ($entity->getZohoItemId() && $entity->isZohoSynced() == false) {
-                    try{
-                        $response = $this->itemService->updateItem(array('item_id' => $entity->getZohoItemId(), 'JSONString' => $entity->toJson()));
-                        $entity->setZohoSynced(true);
-                        $this->persistAndRecomputeChangeset($em, $uow, $entity);
-                    } catch(\Exception $e) {
-                        // log api error
-                        $res = $e->getResponse()->json();
-                        $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                        $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-                        $entity->setZohoError(array($res['code'] => $res['message']));
-                    }
-                }
-                // in case the object was not created on zoho side
-                elseif(is_null($entity->getZohoItemId())) {
-                    try{
-                        // if zoho tax id is not defined and default tax id is defined, we set the default tax id
-                        if(is_null($entity->getZohoTaxId()) && $this->defaultTaxId)
-                            $entity->setZohoTaxId($this->defaultTaxId);
-
-                        $response = $this->itemService->createItem(array('JSONString' => $entity->toJson()));
-                        if(isset($response['item']) && isset($response['item']['item_id'])) {
-                            $entity->setZohoItemId($response['item']['item_id']);
-                            $entity->setZohoSynced(true);
-                            $this->persistAndRecomputeChangeset($em, $uow, $entity);
-                        }
-
-                    }catch(\Exception $e) {
-                        // log api error
-                        $res = $e->getResponse()->json();
-                        $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                        $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-                        $entity->setZohoError(array($res['code'] => $res['message']));
-                    }
-                }
-            }
-        }
-    }
-
-
-
-    /**
-     * @param LifecycleEventArgs $args
-     */
-    public function postPersist(LifecycleEventArgs $args)
-    {
-        $entity = $args->getEntity();
-        $em  = $args->getEntityManager();
-        $classMetadata = $em->getClassMetadata(get_class($entity));
-
-        if ($this->isEntitySupported($classMetadata)) {
-            $this->getLogger()->info('[ZohoItemConnectorSubscriber] postPersist');
-
-            try{
-
-                // if zoho tax id is not defined and default tax id is defined, we set the default tax id
-                if(is_null($entity->getZohoTaxId()) && $this->defaultTaxId)
-                    $entity->setZohoTaxId($this->defaultTaxId);
-
-                $response = $this->itemService->createItem(array('JSONString' => $entity->toJson()));
-                if(isset($response['item']) && isset($response['item']['item_id'])) {
-                    $entity->setZohoItemId($response['item']['item_id']);
-                    $entity->setZohoSynced(true);
-                    $em->persist($entity);
-                    $em->flush();
-                }
-                $this->getLogger()->info('call api');
-
-            }catch(\Exception $e) {
-                // log api error
-                $res = $e->getResponse()->json();
-                $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-                $entity->setZohoError(array($res['code'] => $res['message']));
+                $this->postUpdate($em, $uow, $entity);
             }
         }
     }
 
     /**
-     * @param LifecycleEventArgs $args
+     * @param EntityManager $em
+     * @param $uow
+     * @param $entity
      */
-    public function postUpdate(LifecycleEventArgs $args)
+    private function postPersist(EntityManager $em, $uow, $entity)
     {
-        $entity = $args->getEntity();
-        $em  = $args->getEntityManager();
-        $classMetadata = $em->getClassMetadata(get_class($entity));
+        try{
+            // if zoho tax id is not defined and default tax id is defined, we set the default tax id
+            if(is_null($entity->getZohoTaxId()) && $this->defaultTaxId) {
+                $entity->setZohoTaxId($this->defaultTaxId);
+            }
 
-        // can update only if entity is suported and contact id is set
-        if ($this->isEntitySupported($classMetadata) && $entity->getZohoItemId() && $entity->isZohoSynced() == false) {
-            $this->getLogger()->info('[ZohoItemConnectorSubscriber] postUpdate');
+            $response = $this->itemService->createItem(array('JSONString' => $entity->toJson()));
+            if(isset($response['item']) && isset($response['item']['item_id'])) {
+                $entity->setZohoItemId($response['item']['item_id']);
+                $entity->setZohoSynced(true);
+                $this->persistAndRecomputeChangeset($em, $uow, $entity, true);
+            }
+        } catch(\Exception $e) {
+            // log api error
+            $this->logAPIError($e, $entity);
+        }
+    }
 
+    /**
+     * @param EntityManager $em
+     * @param $uow
+     * @param $entity
+     */
+    private function postUpdate(EntityManager $em, $uow, $entity)
+    {
+        if ($entity->getZohoItemId() && $entity->isZohoSynced() == false) {
             try{
                 $response = $this->itemService->updateItem(array('item_id' => $entity->getZohoItemId(), 'JSONString' => $entity->toJson()));
                 $entity->setZohoSynced(true);
-                $em->persist($entity);
-                $em->flush();
+                $this->persistAndRecomputeChangeset($em, $uow, $entity);
             } catch(\Exception $e) {
                 // log api error
-                $res = $e->getResponse()->json();
-                $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-                $entity->setZohoError(array($res['code'] => $res['message']));
+                $this->logAPIError($e, $entity);
             }
         }
         // in case the object was not created on zoho side
-        elseif($this->isEntitySupported($classMetadata) && is_null($entity->getZohoItemId())) {
-            $this->postPersist($args);
+        elseif(is_null($entity->getZohoItemId())) {
+            $this->postPersist($em, $uow, $entity);
         }
+    }
+
+    /**
+     * @param \Exception $e
+     * @param $entity
+     */
+    private function logAPIError(\Exception $e, $entity)
+    {
+        $res = $e->getResponse()->json();
+        $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
+        $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+        $entity->setZohoError(array($res['code'] => $res['message']));
     }
 
     /**
