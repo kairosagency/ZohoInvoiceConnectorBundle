@@ -18,17 +18,38 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 
 abstract class AbstractDoctrineListener implements EventSubscriber
 {
+    /**
+     * @var \Symfony\Bridge\Monolog\Logger
+     */
     private $logger;
 
+    /**
+     * @var \Kairos\ZohoInvoiceConnectorBundle\Reflection\ClassAnalyzer
+     */
     private $classAnalyser;
 
+    /**
+     * @var bool
+     */
     protected $isRecursive;
 
+    /**
+     * @var String
+     */
     protected $authToken;
 
+    /**
+     * @var String
+     */
     protected $organizationId;
 
-
+    /**
+     * @param Logger $logger
+     * @param ClassAnalyzer $classAnalyser
+     * @param $isRecursive
+     * @param $authToken
+     * @param $organizationId
+     */
     public function __construct(Logger $logger, ClassAnalyzer $classAnalyser, $isRecursive, $authToken, $organizationId)
     {
         $this->classAnalyser = $classAnalyser;
@@ -38,17 +59,27 @@ abstract class AbstractDoctrineListener implements EventSubscriber
         $this->logger = $logger;
     }
 
+    /**
+     * @return ClassAnalyzer
+     */
     protected function getClassAnalyzer()
     {
         return $this->classAnalyser;
     }
 
-
+    /**
+     * @return Logger
+     */
     protected function getLogger()
     {
         return $this->logger;
     }
 
+    /**
+     * @param array $array
+     * @param array $keys
+     * @return bool
+     */
     public function arrayHasKeys($array = array(), $keys =  array())
     {
         foreach($keys AS $key) {

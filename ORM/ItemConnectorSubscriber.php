@@ -46,12 +46,12 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function preUpdate(PreUpdateEventArgs $args)
     {
-        $this->getLogger()->err('[ItemConnectorSubscriber] preUpdate');
-        $entity = $args->getEntity();
+                $entity = $args->getEntity();
         $em  = $args->getEntityManager();
         $classMetadata = $em->getClassMetadata(get_class($entity));
         // can update only if entity is supported and some properties have changed (except the synced to avoid loops ...)
         if ($this->isEntitySupported($classMetadata)) {
+            $this->getLogger()->info('[ZohoItemConnectorSubscriber] preUpdate');
             $uow = $em->getUnitOfWork();
             $changeset = $uow->getEntityChangeSet($entity);
 
@@ -76,12 +76,13 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function postPersist(LifecycleEventArgs $args)
     {
-        $this->getLogger()->err('[ItemConnectorSubscriber] postPersist');
         $entity = $args->getEntity();
         $em  = $args->getEntityManager();
         $classMetadata = $em->getClassMetadata(get_class($entity));
 
         if ($this->isEntitySupported($classMetadata)) {
+            $this->getLogger()->info('[ZohoItemConnectorSubscriber] postPersist');
+
             try{
 
                 // if zoho tax id is not defined and default tax id is defined, we set the default tax id
@@ -112,13 +113,14 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function postUpdate(LifecycleEventArgs $args)
     {
-        $this->getLogger()->err('[PlanConnectorSubscriber] postUpdate');
         $entity = $args->getEntity();
         $em  = $args->getEntityManager();
         $classMetadata = $em->getClassMetadata(get_class($entity));
 
         // can update only if entity is suported and contact id is set
         if ($this->isEntitySupported($classMetadata) && $entity->getZohoItemId() && $entity->isZohoSynced() == false) {
+            $this->getLogger()->info('[ZohoItemConnectorSubscriber] postUpdate');
+
             try{
                 $response = $this->itemService->updateItem(array('item_id' => $entity->getZohoItemId(), 'JSONString' => $entity->toJson()));
                 $entity->setZohoSynced(true);

@@ -50,9 +50,10 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
 
         // can update only if entity is supported and some properties have changed (except the synced to avoid loops ...)
         if ($this->isEntitySupported($classMetadata)) {
+            $this->getLogger()->info('[ZohoContactConnectorSubscriber] preUpdate');
+
             $uow = $em->getUnitOfWork();
             $changeset = $uow->getEntityChangeSet($entity);
-
             $keys = array(
                 'email',
                 'firstName',
@@ -91,6 +92,7 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
         $classMetadata = $em->getClassMetadata(get_class($entity));
 
         if ($this->isEntitySupported($classMetadata)) {
+            $this->getLogger()->info('[ZohoContactConnectorSubscriber] postPersist');
             try{
                 $response = $this->contactService->createContact(array('JSONString' => $entity->toJson()));
 
@@ -123,6 +125,7 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
 
         // can update only if entity is suported and contact id is set
         if ($this->isEntitySupported($classMetadata) && $entity->getZohoContactId() && $entity->isZohoSynced() == false) {
+            $this->getLogger()->info('[ZohoContactConnectorSubscriber] postUpdate');
             try{
                 $response = $this->contactService->updateContact(array('contact_id' => $entity->getZohoContactId(), 'JSONString' => $entity->toJson()));
                 $entity->setZohoSynced(true);

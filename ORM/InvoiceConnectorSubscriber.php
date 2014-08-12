@@ -50,6 +50,7 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
         $classMetadata = $em->getClassMetadata(get_class($entity));
 
         if ($this->isEntitySupported($classMetadata)) {
+            $this->getLogger()->info('[ZohoInvoiceConnectorSubscriber] postPersist');
             try{
                 $response = $this->invoiceService->createInvoice(array('JSONString' => $entity->toJson()));
                 if(isset($response['invoice'])
