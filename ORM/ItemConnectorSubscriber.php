@@ -72,6 +72,86 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
 
 
     /**
+     * @param OnFlushEventArgs $eventArgs
+     */
+    public function onFlush(OnFlushEventArgs $eventArgs)
+    {
+        $em = $eventArgs->getEntityManager();
+        $uow = $em->getUnitOfWork();
+
+        foreach ($uow->getScheduledEntityInsertions() as $entity) {
+            $classMetadata = $em->getClassMetadata(get_class($entity));
+            if($this->isEntitySupported($classMetadata)) {
+                $this->getLogger()->info('[ZohoItemConnectorSubscriber][onFlush] Scheduled for insertion');
+
+                try{
+                    // if zoho tax id is not defined and default tax id is defined, we set the default tax id
+                    if(is_null($entity->getZohoTaxId()) && $this->defaultTaxId)
+                        $entity->setZohoTaxId($this->defaultTaxId);
+
+                    $response = $this->itemService->createItem(array('JSONString' => $entity->toJson()));
+                    if(isset($response['item']) && isset($response['item']['item_id'])) {
+                        $entity->setZohoItemId($response['item']['item_id']);
+                        $entity->setZohoSynced(true);
+                        $this->persistAndRecomputeChangeset($em, $uow, $entity, true);
+                    }
+
+                }catch(\Exception $e) {
+                    // log api error
+                    $res = $e->getResponse()->json();
+                    $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
+                    $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                    $entity->setZohoError(array($res['code'] => $res['message']));
+                }
+            }
+        }
+
+        foreach ($uow->getScheduledEntityUpdates() as $entity) {
+            $classMetadata = $em->getClassMetadata(get_class($entity));
+            if($this->isEntitySupported($classMetadata)) {
+                $this->getLogger()->info('[ZohoItemConnectorSubscriber][onFlush] Scheduled for updates');
+                if ($entity->getZohoItemId() && $entity->isZohoSynced() == false) {
+                    try{
+                        $response = $this->itemService->updateItem(array('item_id' => $entity->getZohoItemId(), 'JSONString' => $entity->toJson()));
+                        $entity->setZohoSynced(true);
+                        $this->persistAndRecomputeChangeset($em, $uow, $entity);
+                    } catch(\Exception $e) {
+                        // log api error
+                        $res = $e->getResponse()->json();
+                        $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
+                        $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                        $entity->setZohoError(array($res['code'] => $res['message']));
+                    }
+                }
+                // in case the object was not created on zoho side
+                elseif(is_null($entity->getZohoItemId())) {
+                    try{
+                        // if zoho tax id is not defined and default tax id is defined, we set the default tax id
+                        if(is_null($entity->getZohoTaxId()) && $this->defaultTaxId)
+                            $entity->setZohoTaxId($this->defaultTaxId);
+
+                        $response = $this->itemService->createItem(array('JSONString' => $entity->toJson()));
+                        if(isset($response['item']) && isset($response['item']['item_id'])) {
+                            $entity->setZohoItemId($response['item']['item_id']);
+                            $entity->setZohoSynced(true);
+                            $this->persistAndRecomputeChangeset($em, $uow, $entity);
+                        }
+
+                    }catch(\Exception $e) {
+                        // log api error
+                        $res = $e->getResponse()->json();
+                        $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
+                        $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+                        $entity->setZohoError(array($res['code'] => $res['message']));
+                    }
+                }
+            }
+        }
+    }
+
+
+
+    /**
      * @param LifecycleEventArgs $args
      */
     public function postPersist(LifecycleEventArgs $args)
@@ -159,6 +239,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function getSubscribedEvents()
     {
-        return [Events::preUpdate, Events::postUpdate, Events::postPersist];
+        return [Events::preUpdate, Events::onFlush];
+        //return [Events::preUpdate, Events::postUpdate, Events::postPersist];
     }
 }
