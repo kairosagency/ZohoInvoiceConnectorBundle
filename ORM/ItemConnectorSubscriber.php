@@ -19,6 +19,7 @@ use Kairos\ZohoInvoiceApi\ZohoInvoiceApiClient;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata,
     Doctrine\ORM\Event\PreUpdateEventArgs,
     Doctrine\ORM\Event\LifecycleEventArgs,
+    Doctrine\ORM\Event\OnFlushEventArgs,
     Doctrine\ORM\Events;
 
 /**
