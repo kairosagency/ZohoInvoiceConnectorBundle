@@ -94,7 +94,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
                     if(isset($response['item']) && isset($response['item']['item_id'])) {
                         $entity->setZohoItemId($response['item']['item_id']);
                         $entity->setZohoSynced(true);
-                        $this->persistAndRecomputeChangeset($em, $uow, $entity, true);
+                        $this->persistAndRecomputeChangeset($em, $uow, $entity);
                     }
 
                 }catch(\Exception $e) {
