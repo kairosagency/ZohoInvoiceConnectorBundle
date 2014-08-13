@@ -106,5 +106,17 @@ abstract class AbstractDoctrineListener implements EventSubscriber
         }
     }
 
+    /**
+     * @param \Exception $e
+     * @param $entity
+     */
+    public function logAPIError(\Exception $e, $entity)
+    {
+        $res = $e->getResponse()->json();
+        $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
+        $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
+        $entity->setZohoError(array($res['code'] => $res['message']));
+    }
+
     abstract public function getSubscribedEvents();
 }

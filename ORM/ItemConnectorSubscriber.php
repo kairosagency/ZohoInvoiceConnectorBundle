@@ -65,8 +65,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
             );
             if($this->arrayHasKeys($changeset, $keys)) {
                 $entity->setZohoSynced(false);
-                $em->persist($entity);
-                $uow->recomputeSingleEntityChangeSet($classMetadata, $entity);
+                $this->persistAndRecomputeChangeset($em, $uow, $entity);
             }
         }
     }
@@ -114,7 +113,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
             if(isset($response['item']) && isset($response['item']['item_id'])) {
                 $entity->setZohoItemId($response['item']['item_id']);
                 $entity->setZohoSynced(true);
-                $this->persistAndRecomputeChangeset($em, $uow, $entity, true);
+                $this->persistAndRecomputeChangeset($em, $uow, $entity);
             }
         } catch(\Exception $e) {
             // log api error
@@ -143,18 +142,6 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
         elseif(is_null($entity->getZohoItemId())) {
             $this->postPersist($em, $uow, $entity);
         }
-    }
-
-    /**
-     * @param \Exception $e
-     * @param $entity
-     */
-    private function logAPIError(\Exception $e, $entity)
-    {
-        $res = $e->getResponse()->json();
-        $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-        $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-        $entity->setZohoError(array($res['code'] => $res['message']));
     }
 
     /**

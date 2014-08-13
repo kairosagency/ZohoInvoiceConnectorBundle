@@ -130,10 +130,7 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
 
             } catch(\Exception $e) {
                 // log api error
-                $res = $e->getResponse()->json();
-                $this->getLogger()->error('[Guzzle error] ' . $e->getMessage());
-                $this->getLogger()->error('[Zoho response code] ' . $res['code'] . ' [Zoho error message] ' . $res['message']);
-                $entity->setZohoError(array($res['code'] => $res['message']));
+                $this->logAPIError($e, $entity);
             }
         }
     }
