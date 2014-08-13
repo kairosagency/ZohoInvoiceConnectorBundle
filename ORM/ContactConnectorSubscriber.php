@@ -184,6 +184,7 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
      */
     public function getSubscribedEvents()
     {
-        return [Events::preUpdate, Events::postUpdate, Events::postPersist];
+        return [Events::preUpdate, Events::onFlush];
+        //return [Events::preUpdate, Events::postUpdate, Events::postPersist];
     }
 }
