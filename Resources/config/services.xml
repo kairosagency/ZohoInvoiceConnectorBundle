@@ -16,6 +16,7 @@
         <parameter key="kairos_zoho_connector_bundle.auth_token"/>
         <parameter key="kairos_zoho_connector_bundle.organization_id"/>
         <parameter key="kairos_zoho_connector_bundle.default_tax_id"/>
+        <parameter key="kairos_zoho_connector_bundle.sandbox"/>
     </parameters>
 
     <services>
@@ -46,6 +47,7 @@
             <argument>%kairos_zoho_connector_bundle.isRecursive%</argument>
             <argument>%kairos_zoho_connector_bundle.auth_token%</argument>
             <argument>%kairos_zoho_connector_bundle.organization_id%</argument>
+            <argument>%kairos_zoho_connector_bundle.sandbox%</argument>
             <tag name="doctrine.event_subscriber"/>
         </service>
     </services>

@@ -28,5 +28,6 @@ class KairosZohoInvoiceConnectorExtension extends Extension
         $container->setParameter('kairos_zoho_connector_bundle.auth_token', $config['auth_token']);
         $container->setParameter('kairos_zoho_connector_bundle.organization_id', $config['organization_id']);
         $container->setParameter('kairos_zoho_connector_bundle.default_tax_id', $config['default_tax_id']);
+        $container->setParameter('kairos_zoho_connector_bundle.sandbox', $config['sandbox']);
     }
 }

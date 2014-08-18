@@ -40,51 +40,6 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
         $this->contactService = ZohoInvoiceApiClient::getService('Contacts/ContactsService', array('authtoken' => $this->authToken, 'organization_id' => $this->organizationId));
     }
 
-
-    /**
-     * @param PreUpdateEventArgs $args
-     */
-    public function preUpdate(PreUpdateEventArgs $args)
-    {
-        $entity = $args->getEntity();
-        $em  = $args->getEntityManager();
-        $classMetadata = $em->getClassMetadata(get_class($entity));
-
-        // can update only if entity is supported and some properties have changed (except the synced to avoid loops ...)
-        if ($this->isEntitySupported($classMetadata)) {
-            $this->getLogger()->info('[ZohoContactConnectorSubscriber] preUpdate');
-
-            $uow = $em->getUnitOfWork();
-            $changeset = $uow->getEntityChangeSet($entity);
-            $keys = array(
-                'email',
-                'firstName',
-                'lastName',
-                'billingStreet',
-                'billingCity',
-                'billingState',
-                'billingZipcode',
-                'billingCountry',
-                'zohoCurrencyId',
-                'civility',
-                'companyName',
-                'website',
-                'contactPhone',
-                'contactMobile',
-                'zohoCustomField1',
-                'zohoCustomField2',
-                'zohoCustomField3',
-            );
-            if($this->arrayHasKeys($changeset, $keys)) {
-                $entity->setZohoSynced(false);
-                $this->persistAndRecomputeChangeset($em, $uow, $entity);
-            }
-        }
-    }
-
-
-
-
     /**
      * @param OnFlushEventArgs $eventArgs
      */
@@ -104,19 +59,42 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             $classMetadata = $em->getClassMetadata(get_class($entity));
             if($this->isEntitySupported($classMetadata)) {
+                $changeset = $uow->getEntityChangeSet($entity);
+                $keys = array(
+                    'email',
+                    'firstName',
+                    'lastName',
+                    'billingStreet',
+                    'billingCity',
+                    'billingState',
+                    'billingZipcode',
+                    'billingCountry',
+                    'zohoCurrencyId',
+                    'civility',
+                    'companyName',
+                    'website',
+                    'contactPhone',
+                    'contactMobile',
+                    'zohoCustomField1',
+                    'zohoCustomField2',
+                    'zohoCustomField3',
+                );
+                if($this->arrayHasKeys($changeset, $keys)) {
+                    $entity->setZohoSynced(false);
+                }
+
                 $this->getLogger()->info('[ZohoItemConnectorSubscriber][onFlush] Scheduled for updates');
                 $this->postUpdate($em, $uow, $entity);
             }
         }
     }
 
-
     /**
      * @param EntityManager $em
      * @param $uow
      * @param $entity
      */
-    public function postPersist(EntityManager $em, $uow, $entity)
+    private function postPersist(EntityManager $em, $uow, $entity)
     {
         $classMetadata = $em->getClassMetadata(get_class($entity));
 
@@ -138,13 +116,12 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
         }
     }
 
-
     /**
      * @param EntityManager $em
      * @param $uow
      * @param $entity
      */
-    public function postUpdate(EntityManager $em, $uow, $entity)
+    private function postUpdate(EntityManager $em, $uow, $entity)
     {
         $classMetadata = $em->getClassMetadata(get_class($entity));
 
@@ -165,7 +142,6 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
         }
     }
 
-
     /**
      * Checks whether provided entity is supported.
      *
@@ -185,7 +161,7 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
      */
     public function getSubscribedEvents()
     {
-        return [Events::preUpdate, Events::onFlush];
+        return [Events::onFlush];
         //return [Events::preUpdate, Events::postUpdate, Events::postPersist];
     }
 }

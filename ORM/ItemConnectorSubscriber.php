@@ -43,35 +43,6 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
     }
 
     /**
-     * @param PreUpdateEventArgs $args
-     */
-    public function preUpdate(PreUpdateEventArgs $args)
-    {
-        $entity = $args->getEntity();
-        $em  = $args->getEntityManager();
-        $classMetadata = $em->getClassMetadata(get_class($entity));
-        // can update only if entity is supported and some properties have changed (except the synced to avoid loops ...)
-        if ($this->isEntitySupported($classMetadata)) {
-            $this->getLogger()->info('[ZohoItemConnectorSubscriber] preUpdate');
-            $uow = $em->getUnitOfWork();
-            $changeset = $uow->getEntityChangeSet($entity);
-
-            $keys = array(
-                'name',
-                'description',
-                'rate',
-                'unit',
-                'zohoTaxId',
-            );
-            if($this->arrayHasKeys($changeset, $keys)) {
-                $entity->setZohoSynced(false);
-                $this->persistAndRecomputeChangeset($em, $uow, $entity);
-            }
-        }
-    }
-
-
-    /**
      * @param OnFlushEventArgs $eventArgs
      */
     public function onFlush(OnFlushEventArgs $eventArgs)
@@ -90,6 +61,19 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
         foreach ($uow->getScheduledEntityUpdates() as $entity) {
             $classMetadata = $em->getClassMetadata(get_class($entity));
             if($this->isEntitySupported($classMetadata)) {
+
+                $changeset = $uow->getEntityChangeSet($entity);
+                $keys = array(
+                    'name',
+                    'description',
+                    'rate',
+                    'unit',
+                    'zohoTaxId',
+                );
+                if($this->arrayHasKeys($changeset, $keys)) {
+                    $entity->setZohoSynced(false);
+                }
+
                 $this->getLogger()->info('[ZohoItemConnectorSubscriber][onFlush] Scheduled for updates');
                 $this->postUpdate($em, $uow, $entity);
             }
@@ -163,7 +147,7 @@ class ItemConnectorSubscriber extends AbstractDoctrineListener
      */
     public function getSubscribedEvents()
     {
-        return [Events::preUpdate, Events::onFlush];
+        return [Events::onFlush];
         //return [Events::preUpdate, Events::postUpdate, Events::postPersist];
     }
 }

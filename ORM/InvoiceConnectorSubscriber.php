@@ -33,9 +33,12 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
 
     protected $paymentService;
 
-    public function __construct(Logger $logger, ClassAnalyzer $classAnalyser, $isRecursive, $authToken, $organizationId)
+    protected $sandbox;
+
+    public function __construct(Logger $logger, ClassAnalyzer $classAnalyser, $isRecursive, $authToken, $organizationId, $sandbox)
     {
         parent::__construct($logger, $classAnalyser, $isRecursive, $authToken, $organizationId);
+        $this->sandbox = $sandbox;
         $this->invoiceService = ZohoInvoiceApiClient::getService('Invoices/InvoicesService', array('authtoken' => $this->authToken, 'organization_id' => $this->organizationId));
         $this->paymentService = ZohoInvoiceApiClient::getService('CustomerPayments/CustomerPaymentsService', array('authtoken' => $this->authToken, 'organization_id' => $this->organizationId));
     }
@@ -81,7 +84,8 @@ class InvoiceConnectorSubscriber extends AbstractDoctrineListener
             }
 
             if($entity->getPayInvoice()) {
-                $this->payInvoice($entity);
+                if(!$this->sandbox)
+                    $this->payInvoice($entity);
             }
         }
     }

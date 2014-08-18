@@ -33,6 +33,10 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('default_tax_id')
                     ->info('default tax id')
                 ->end()
+                ->booleanNode('sandbox')
+                    ->info('Sandbox mode')
+                    ->defaultTrue()
+                ->end()
             ->end();
 
         return $treeBuilder;
