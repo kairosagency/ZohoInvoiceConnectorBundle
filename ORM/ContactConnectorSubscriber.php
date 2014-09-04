@@ -101,12 +101,13 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
         if ($this->isEntitySupported($classMetadata)) {
             try{
                 $response = $this->contactService->createContact(array('JSONString' => $entity->toJson()));
+                $this->getLogger()->info(json_encode($response));
 
                 if(isset($response['contact']) && isset($response['contact']['contact_id']) && isset($response['contact']['primary_contact_id'])) {
                     $entity->setZohoContactId($response['contact']['contact_id']);
                     $entity->setZohoContactPersonId($response['contact']['primary_contact_id']);
                     $entity->setZohoSynced(true);
-                    $this->persistAndRecomputeChangeset($em, $uow, $entity, true);
+                    $this->persistAndRecomputeChangeset($em, $uow, $entity);
                 }
 
             }catch(\Exception $e) {

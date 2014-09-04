@@ -129,7 +129,7 @@ trait ContactConnectorMethods
      */
     public function getFullname()
     {
-        return $this->civility . ' ' . $this->firstName . ' ' .  $this->lastName;
+        return $this->civility . ' ' . $this->firstName . ' ' .  $this->lastName . ' (' . $this->companyName . ')';
     }
 
     /**
