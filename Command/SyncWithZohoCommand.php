@@ -59,7 +59,8 @@ EOT
                 }
             }
 
-            if($classAnalyzer->hasTrait($classMetadata->reflClass, 'Kairos\ZohoInvoiceConnectorBundle\Model\Contact\ContactConnector')) {
+            if( $classAnalyzer->hasTrait($classMetadata->reflClass, 'Kairos\ZohoInvoiceConnectorBundle\Model\Contact\ContactConnector')
+                || $classAnalyzer->hasTrait($classMetadata->reflClass, 'Kairos\ZohoInvoiceConnectorBundle\Model\Contact\ContactConnectorSafe')) {
                 $unsynced = $em->getRepository($class)->findBy(array('synced' => false));
                 foreach($unsynced AS $entity) {
                     $output->writeln('<info>Found unsynced entity of class </info>' . '<comment>' . $class . '</comment>');

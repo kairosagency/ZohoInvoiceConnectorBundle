@@ -152,7 +152,8 @@ class ContactConnectorSubscriber extends AbstractDoctrineListener
      */
     private function isEntitySupported(ClassMetadata $classMetadata)
     {
-        return $this->getClassAnalyzer()->hasTrait($classMetadata->reflClass, 'Kairos\ZohoInvoiceConnectorBundle\Model\Contact\ContactConnector', $this->isRecursive);
+        return  ($this->getClassAnalyzer()->hasTrait($classMetadata->reflClass, 'Kairos\ZohoInvoiceConnectorBundle\Model\Contact\ContactConnector', $this->isRecursive) ||
+                $this->getClassAnalyzer()->hasTrait($classMetadata->reflClass, 'Kairos\ZohoInvoiceConnectorBundle\Model\Contact\ContactConnectorSafe', $this->isRecursive));
     }
 
     /**
