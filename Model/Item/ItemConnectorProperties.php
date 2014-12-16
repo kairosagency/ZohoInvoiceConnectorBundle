@@ -2,7 +2,7 @@
 
 namespace Kairos\ZohoInvoiceConnectorBundle\Model\Item;
 
-use Doctrine\Common\Annotations\AnnotationRegistry AS Assert;
+use Symfony\Component\Validation\Constraints AS Assert;
 
 /**
  * ItemConnectorProperties trait.
