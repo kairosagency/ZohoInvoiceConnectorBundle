@@ -2,9 +2,6 @@
 
 namespace Kairos\ZohoInvoiceConnectorBundle\Model\Contact;
 
-use Symfony\Component\Validator\Constraints as Assert;
-
-
 /**
  * ContactConnectorProperties trait.
  *

@@ -3,6 +3,8 @@
 namespace Kairos\ZohoInvoiceConnectorBundle\Model\Item;
 
 use Kairos\ZohoInvoiceConnectorBundle\Model AS BaseTrait;
+use Symfony\Component\Validator\Constraints as Assert;
+
 /**
  * ItemConnector trait.
  *

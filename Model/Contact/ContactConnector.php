@@ -3,6 +3,7 @@
 namespace Kairos\ZohoInvoiceConnectorBundle\Model\Contact;
 
 use Kairos\ZohoInvoiceConnectorBundle\Model AS BaseTrait;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * ContactConnector trait.
