@@ -2,6 +2,9 @@
 
 namespace Kairos\ZohoInvoiceConnectorBundle\Model\Contact;
 
+use Doctrine\Common\Annotations\AnnotationRegistry AS Assert;
+
+
 /**
  * ContactConnectorProperties trait.
  *

@@ -2,6 +2,8 @@
 
 namespace Kairos\ZohoInvoiceConnectorBundle\Model\Item;
 
+use Doctrine\Common\Annotations\AnnotationRegistry AS Assert;
+
 /**
  * ItemConnectorProperties trait.
  *
